@@ -1,3 +1,5 @@
+package com.zaloni.mgohain.services
+
 import org.apache.spark.SparkConf
 import org.apache.spark.streaming.{Seconds, StreamingContext}
 
@@ -7,8 +9,8 @@ import org.apache.spark.streaming.{Seconds, StreamingContext}
   */
 object WordCount {
   def main(args : Array[String]): Unit = {
-    if (args.length != 1) {
-      System.err.println("Usage: " + WordCount.getClass.getSimpleName + " directory_name")
+    if (args.length != 2) {
+      System.err.println("Usage: " + WordCount.getClass.getSimpleName + " input_directory_name output_directory_name")
       System.err.println("Give the directory path")
       System.exit(1)
     }
@@ -21,6 +23,7 @@ object WordCount {
     //Reduce phase
     val counts = wordMap.reduceByKey(_+_)
     counts.print()
+    counts.saveAsTextFiles(args(1))
     ssc.start()
     ssc.awaitTermination()
   }
