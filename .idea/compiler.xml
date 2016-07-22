@@ -23,11 +23,13 @@
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="true" />
         <module name="sparkStreaming" />
+        <module name="sqlImplementation" />
         <module name="wordCount" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="sparkStreaming" target="1.5" />
+      <module name="sqlImplementation" target="1.5" />
       <module name="wordCount" target="1.5" />
     </bytecodeTargetLevel>
   </component>
