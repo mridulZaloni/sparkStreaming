@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/hbaseIntegration/hbaseIntegration.iml" filepath="$PROJECT_DIR$/hbaseIntegration/hbaseIntegration.iml" />
       <module fileurl="file://$PROJECT_DIR$/jsonOutput/jsonOutput.iml" filepath="$PROJECT_DIR$/jsonOutput/jsonOutput.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/sparkStreaming.iml" filepath="$PROJECT_DIR$/.idea/sparkStreaming.iml" />
       <module fileurl="file://$PROJECT_DIR$/sqlImplementation/sqlImplementation.iml" filepath="$PROJECT_DIR$/sqlImplementation/sqlImplementation.iml" />

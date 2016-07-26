@@ -10,6 +10,7 @@
         <option value="$PROJECT_DIR$/wordCount/pom.xml" />
         <option value="$PROJECT_DIR$/sqlImplementation/pom.xml" />
         <option value="$PROJECT_DIR$/jsonOutput/pom.xml" />
+        <option value="$PROJECT_DIR$/hbaseIntegration/pom.xml" />
       </list>
     </option>
   </component>
