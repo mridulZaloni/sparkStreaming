@@ -22,12 +22,14 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="true" />
+        <module name="jsonOutput" />
         <module name="sparkStreaming" />
         <module name="sqlImplementation" />
         <module name="wordCount" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="jsonOutput" target="1.5" />
       <module name="sparkStreaming" target="1.5" />
       <module name="sqlImplementation" target="1.5" />
       <module name="wordCount" target="1.5" />
