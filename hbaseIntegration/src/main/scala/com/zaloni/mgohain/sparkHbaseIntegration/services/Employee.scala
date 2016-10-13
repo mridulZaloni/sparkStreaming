@@ -1,60 +1,48 @@
 package com.zaloni.mgohain.sparkHbaseIntegration.services
 
-import org.apache.hadoop.hbase.client.{HBaseAdmin, Put}
-import org.apache.hadoop.hbase.io.ImmutableBytesWritable
+import org.apache.hadoop.hbase.client.{HBaseAdmin, HTable, Put}
 import org.apache.hadoop.hbase.mapreduce.TableOutputFormat
 import org.apache.hadoop.hbase.util.Bytes
-import org.apache.hadoop.hbase.{MasterNotRunningException, HBaseConfiguration}
-import org.apache.hadoop.mapred.JobConf
-import org.apache.spark.{SparkConf, SparkContext}
-
-/**
-  * Created by mgohain on 7/26/2016.
-  * This class will read employee records from a csv file and store it to hbase
-  */
-
-case class Employee(eId: String, name: String, designation: String, doj: String, address: String, mobile: String, dob: String)
+import org.apache.hadoop.hbase.{HBaseConfiguration, HColumnDescriptor, HTableDescriptor}
 
 object Employee {
-  def main(args: Array[String]) = {
-    val sparkConf = new SparkConf().setAppName("Spark Hbase Integration").setMaster("local[2]")
-    val sparkContext = new SparkContext(sparkConf)
-    val records = sparkContext.textFile(args(0))
-    val hBaseConfiguration = HBaseConfiguration.create()
-    try {
-      hBaseConfiguration.set("hbase.zookeeper.quorum", "127.0.0.1")
-      HBaseAdmin.checkHBaseAvailable(hBaseConfiguration)
-    } catch  {
-      case e : MasterNotRunningException =>
-        System.out.println("Hbase is not running")
-        System.exit(1)
+  def main(args: Array[String]) {
+    if (args.length != 1) {
+      System.err.println("In correct number of arguments " + args.length)
+      System.out.println("Please provide correct arguments.")
+      System.exit(1)
     }
-    val table = "Employee"
-    hBaseConfiguration.set(TableOutputFormat.OUTPUT_TABLE, table)
-    val employees = records.map(Employee.parseToEmployee)
-    val jobConf = new JobConf(hBaseConfiguration)
-    employees.saveAsTextFile(args(1))
-    val puts = employees.map(employee => Employee.convertToPut(employee))
-    puts.saveAsHadoopDataset(jobConf)
-  }
-
-  def parseToEmployee(record: String): Employee = {
-    val tokens = record.split(",")
-    Employee(tokens(0), tokens(1), tokens(2), tokens(3), tokens(4), tokens(5), tokens(6))
-  }
-
-  def convertToPut(employee: Employee): (ImmutableBytesWritable, Put) = {
+    val hbaseConf = HBaseConfiguration.create()
+    val tableName = "employee"
+    hbaseConf.set(TableOutputFormat.OUTPUT_TABLE, tableName)
+    hbaseConf.set("hbase.zookeeper.quorum","quickstart.cloudera")
+    hbaseConf.set("hbase.zookeeper.property.client.port","2181")
+    val admin = new HBaseAdmin(hbaseConf)
     val cfProfessionalData = Bytes.toBytes("professional_data")
     val cfPersonalData = Bytes.toBytes("personal_data")
-    val rowKey = "e_" + employee.eId
-    val put = new Put(Bytes.toBytes(rowKey))
-    put.add(cfProfessionalData, Bytes.toBytes("Emp_Id"), Bytes.toBytes(employee.eId))
-    put.add(cfProfessionalData, Bytes.toBytes("Name"), Bytes.toBytes(employee.name))
-    put.add(cfProfessionalData, Bytes.toBytes("Designation"), Bytes.toBytes(employee.designation))
-    put.add(cfProfessionalData, Bytes.toBytes("DOJ"), Bytes.toBytes(employee.doj))
-    put.add(cfPersonalData, Bytes.toBytes("Address"), Bytes.toBytes(employee.address))
-    put.add(cfPersonalData, Bytes.toBytes("Phone"), Bytes.toBytes(employee.mobile))
-    put.add(cfPersonalData, Bytes.toBytes("DOB"), Bytes.toBytes(employee.dob))
-    (new ImmutableBytesWritable(Bytes.toBytes(rowKey)), put)
+    if (!admin.isTableAvailable(tableName)) {
+      val tableDesc = new HTableDescriptor(tableName)
+      tableDesc.addFamily(new HColumnDescriptor(cfProfessionalData))
+      tableDesc.addFamily(new HColumnDescriptor(cfPersonalData))
+    }
+    val hTable = new HTable(hbaseConf,tableName)
+    //val records = sc.textFile(args(0))
+    val put = new Put(Bytes.toBytes("e_1"))
+    val eId = Bytes.toBytes("Emp_id")
+    val name = Bytes.toBytes("Name")
+    val dsgtn = Bytes.toBytes("Designation")
+    val doj = Bytes.toBytes("DOJ")
+    val addr = Bytes.toBytes("Address")
+    val phn = Bytes.toBytes("Phone")
+    val dob = Bytes.toBytes("DOB")
+    put.add(cfProfessionalData, eId, Bytes.toBytes(1))
+    put.add(cfProfessionalData, name, Bytes.toBytes("Mridul Gohain"))
+    put.add(cfProfessionalData, dsgtn, Bytes.toBytes("SE"))
+    put.add(cfProfessionalData, doj, Bytes.toBytes("15-07-2015"))
+    put.add(cfPersonalData, addr, Bytes.toBytes("Chabua"))
+    put.add(cfPersonalData, phn, Bytes.toBytes("9859559606"))
+    put.add(cfPersonalData, dob, Bytes.toBytes("04-10-1991"))
+    hTable.put(put)
+    hTable.close()
   }
 }
